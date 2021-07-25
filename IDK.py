@@ -98,4 +98,4 @@ if mode not in mode:
     sys.exit(1)
 
 Kross = Toni(inputdir, mode)
-print("Your file/s were placed in " + output_file)
+print("Your file/s were placed in " + outputdir)
