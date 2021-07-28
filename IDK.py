@@ -16,13 +16,12 @@ class Toni:
         self.inputdir = inputdir
         self.mode = mode
         self.index = 0
-        self.change()
 
     def change(self):
         if os.path.isfile(self.inputdir):
             if fnmatch.fnmatch(self.inputdir, '*.txt'):
                 self.index = 1
-                self.process_me(self.inputdir)
+                self.file_and_folder(self.inputdir)
         else:
             self.split_folder()
 
@@ -60,31 +59,38 @@ class Toni:
                                                            files_in_folder))
         return output_title
 
-    def split_folder(self):
-        for (dirpath, _, filenames) in walk(self.inputdir):
-            for filename in filenames:
-                if fnmatch.fnmatch(self.inputdir, '*.txt'):
-                    self.index += 1
-                    full_filename = inputdir + '/' + filename
-                    self.process_me(full_filename)
-            break  # This stops after the first round which is the top folder - remove to process subfolders
-
-    def process_me(self, full_filename):
-        just_title = os.path.basename(full_filename)
+    def file_and_folder(self, filename):
+        just_title = os.path.basename(filename)
+        with open(filename, 'rb') as whatever:
+            data = whatever.read()
+        with open(filename, 'wb') as whatever:
+            whatever.write(just_title.encode() + data)
         output_title = self.formatting()
+        print(output_title)
         IV = "%032x" % (random.getrandbits(128))
-        output_file = output_title[:output_title.rfind("_")] + str(self.index) + output_title[
-                                                                                      output_title.rfind("_"):]
+        new_title = output_title[:output_title.rfind("_")] + str(self.index) + output_title[
+                                                                               output_title.rfind("_"):]
+        print(new_title)
         try:
             subprocess.check_call(
-                ["openssl", "enc", cipher, "-in", full_filename, "-out", output_file, "-k", pk, "-iv", IV])
+                [r"C:\Program Files\OpenSSL-Win64\bin\openssl.exe", "enc", cipher, "-in", filename, "-out",
+                 new_title, "-k", pk, "-iv", IV])
         except subprocess.CalledProcessError as ex:
             print("Error while calling openSSL", ex)
 
-        with open(output_file, "rb") as rock:
+        with open(new_title, "rb") as rock:
             paper = rock.read()
-        with open(output_file, "wb") as scissors:
+        with open(new_title, "wb") as scissors:
             scissors.write(just_title.encode() + paper)
+
+    def split_folder(self):
+        for (dirpath, _, filenames) in walk(self.inputdir):
+            filenames.sort()
+            for filename in filenames:
+                if fnmatch.fnmatch(self.inputdir, '*.txt'):
+                    self.index += 1
+                    self.file_and_folder(os.path.join(dirpath, filename))
+            break  # This stops after the first round which is the top folder - remove to process subfolders
 
 
 if len(sys.argv) > 1:
@@ -98,4 +104,5 @@ if mode not in mode:
     sys.exit(1)
 
 Kross = Toni(inputdir, mode)
+Kross.change()
 print("Your file/s were placed in " + outputdir)
