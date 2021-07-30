@@ -4,11 +4,11 @@ from os import walk, path
 import subprocess, sys, json, glob, random
 from datetime import date
 
-outputdir = r"C:\Users\eitan\OneDrive\מסמכים\IDK\output"
-mode = {'a': 'mode a', 'A': 'mode a', 'b': 'mode b', 'B': 'mode b'}
+outputdir = r"C:\IDK\output"
+type = {'a': 'mode_a', 'A': 'mode_a', 'b': 'mode_b', 'B': 'mode_b'}
 cipher = "-aes-256-cbc"
 pk = 'dlB6WZF6rWoBysnUbnLC0v8N5OunsoEyq/QkrP3cmEY='
-json_file = r"C:\Users\eitan\OneDrive\מסמכים\IDK\json_file.JSON"
+json_file = r"C:\IDK\json_file.JSON"
 
 
 class Toni:
@@ -61,10 +61,7 @@ class Toni:
 
     def file_and_folder(self, filename):
         just_title = os.path.basename(filename)
-        with open(filename, 'rb') as whatever:
-            data = whatever.read()
-        with open(filename, 'wb') as whatever:
-            whatever.write(just_title.encode() + data)
+
         output_title = self.formatting()
         print(output_title)
         IV = "%032x" % (random.getrandbits(128))
@@ -83,6 +80,11 @@ class Toni:
         with open(new_title, "wb") as scissors:
             scissors.write(just_title.encode() + paper)
 
+        with open(new_title, 'rb') as whatever:
+            data = whatever.read()
+        with open(new_title, 'wb') as whatever:
+            whatever.write(just_title.encode() + data)
+
     def split_folder(self):
         for (dirpath, _, filenames) in walk(self.inputdir):
             filenames.sort()
@@ -99,10 +101,10 @@ else:
     inputdir = input("Enter the folder name: ")
 
 mode = input("Enter the mode (A/B): ")
-if mode not in mode:
+if mode not in type:
     print("Error: wrong mode, choose a or b")
     sys.exit(1)
 
-Kross = Toni(inputdir, mode)
+Kross = Toni(inputdir, type[mode])
 Kross.change()
 print("Your file/s were placed in " + outputdir)
